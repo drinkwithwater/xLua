@@ -84,7 +84,14 @@ namespace XLua
                 LuaAPI.luaopen_xlua(rawL);
                 LuaAPI.luaopen_i64lib(rawL);
 
-                translator = new ObjectTranslator(this, rawL);
+                if (!InternalGlobals.ifgen)
+                {
+                    translator = new ObjectTranslator(this, rawL);
+                }
+                else
+                {
+                    translator = InternalGlobals.ifgen_objectTranslatorMaker(this, rawL);
+                }
                 translator.createFunctionMetatable(rawL);
                 translator.OpenLib(rawL);
                 ObjectTranslatorPool.Instance.Add(rawL, translator);

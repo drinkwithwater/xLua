@@ -102,8 +102,9 @@ namespace XLua
     public delegate int CSharpWrapper(IntPtr L, int top);
 #endif
 
+
     public partial class ObjectTranslator
-	{
+    {
         internal MethodWrapsCache methodWrapsCache;
         internal ObjectCheckers objectCheckers;
         internal ObjectCasters objectCasters;
@@ -218,13 +219,6 @@ namespace XLua
 
         public ObjectTranslator(LuaEnv luaenv,RealStatePtr L)
 		{
-#if XLUA_GENERAL  || (UNITY_WSA && !UNITY_EDITOR)
-            var dumb_field = typeof(ObjectTranslator).GetField("s_gen_reg_dumb_obj", BindingFlags.Static| BindingFlags.DeclaredOnly | BindingFlags.NonPublic);
-            if (dumb_field != null)
-            {
-                dumb_field.GetValue(null);
-            }
-#endif
             assemblies = new List<Assembly>();
 
 #if (UNITY_WSA && !ENABLE_IL2CPP) && !UNITY_EDITOR
@@ -519,7 +513,7 @@ namespace XLua
                 else
 #endif
                 {
-                    bridge = new DelegateBridge(reference, luaEnv);
+                    bridge = InternalGlobals.ifgen_delegateBridgeMaker(reference, luaEnv);
                 }
             }
             catch(Exception e)

@@ -66,8 +66,9 @@ namespace XLua
 
         internal static volatile LuaCSFunction LazyReflectionWrap = new LuaCSFunction(Utils.LazyReflectionCall);
 
-        public static bool Gen_Flag { get; } = false;
-        public static Func<int, LuaEnv, DelegateBridgeBase> delegateBridgeMaker;
+        public static bool ifgen { get; } = false;
+        public static Func<int, LuaEnv, DelegateBridgeBase> ifgen_delegateBridgeMaker;
+        public static Func<LuaEnv, RealStatePtr, ObjectTranslator> ifgen_objectTranslatorMaker;
 
         static InternalGlobals()
         {
@@ -76,7 +77,7 @@ namespace XLua
                 select assembly.GetType($"XLua.{nameof(InternalGlobalsIniter)}")).FirstOrDefault(x => x!=null);
             if (InternalGlobalsIniter != null)
             {
-                Gen_Flag = true;
+                ifgen = true;
                 Activator.CreateInstance(InternalGlobalsIniter);
             }
         }
@@ -85,12 +86,15 @@ namespace XLua
             Dictionary<Type, IEnumerable<MethodInfo>> _extensionMethodMap, 
             TryArrayGet _genTryArrayGetPtr,
             TryArraySet _genTryArraySetPtr,
-            Func<int, LuaEnv, DelegateBridgeBase> _delegateBridgeMaker)
+            Func<int, LuaEnv, DelegateBridgeBase> _delegateBridgeMaker,
+            Func<LuaEnv, RealStatePtr, ObjectTranslator> _objectTranslatorMaker
+            )
         {
             extensionMethodMap = _extensionMethodMap;
             genTryArrayGetPtr = _genTryArrayGetPtr;
             genTryArraySetPtr = _genTryArraySetPtr;
-            delegateBridgeMaker = _delegateBridgeMaker;
+            ifgen_delegateBridgeMaker = _delegateBridgeMaker;
+            ifgen_objectTranslatorMaker = _objectTranslatorMaker;
         }
 
     }
