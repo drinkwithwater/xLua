@@ -295,7 +295,7 @@ namespace XLua
             }
 
             MethodInfo caster;
-            
+
             if (fixCaster.TryGetValue(type, out caster))
             {
                 il.Emit(OpCodes.Call, caster);
@@ -425,7 +425,7 @@ namespace XLua
                     {
                         if (property.CanRead)
                         {
-                            var getter_buildler = defineImplementMethod(impl_type_builder, property.GetGetMethod(), 
+                            var getter_buildler = defineImplementMethod(impl_type_builder, property.GetGetMethod(),
                                 MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig);
                             emitMethodImpl(property.GetGetMethod(), getter_buildler.GetILGenerator(), true);
                             prop_builder.SetGetMethod(getter_buildler);
@@ -441,7 +441,7 @@ namespace XLua
                     }
                     if (property.CanRead)
                     {
-                        MethodBuilder getter_buildler = impl_type_builder.DefineMethod("get_" + property.Name, 
+                        MethodBuilder getter_buildler = impl_type_builder.DefineMethod("get_" + property.Name,
                             MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
                             property.PropertyType, Type.EmptyTypes);
 
@@ -506,8 +506,8 @@ namespace XLua
                     }
                     if (property.CanWrite)
                     {
-                        MethodBuilder setter_builder = impl_type_builder.DefineMethod("set_" + property.Name, 
-                            MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, 
+                        MethodBuilder setter_builder = impl_type_builder.DefineMethod("set_" + property.Name,
+                            MethodAttributes.Virtual | MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
                             null, new Type[] { property.PropertyType });
 
                         ILGenerator il = setter_builder.GetILGenerator();
@@ -571,7 +571,7 @@ namespace XLua
                 }
                 else if(member.MemberType == MemberTypes.Event)
                 {
-                    
+
                     EventInfo event_info = member as EventInfo;
                     EventBuilder event_builder = impl_type_builder.DefineEvent(event_info.Name, event_info.Attributes, event_info.EventHandlerType);
                     if (event_info.GetAddMethod() != null)
@@ -590,7 +590,7 @@ namespace XLua
                     }
                 }
             }
-            
+
 
             // Constructor
             var ctor_param_types = new Type[] { typeof(int), typeof(LuaEnv) };
@@ -721,7 +721,7 @@ namespace XLua
                 il.Emit(OpCodes.Ldc_I4, (buffer[3] >> 16) & 0xFF);
                 il.Emit(OpCodes.Newobj, decimalConstructor);
             }
-            else if (type.IsValueType) 
+            else if (type.IsValueType)
             {
                 il.Emit(OpCodes.Ldloca, localIndex);
                 il.Emit(OpCodes.Initobj, type);
@@ -1225,7 +1225,7 @@ namespace XLua
         static bool isMethodInBlackList(MethodBase mb)
         {
             if (mb.GetParameters().Any(pInfo => pInfo.ParameterType.IsPointer)) return true;
-            if (mb is MethodInfo && (mb as MethodInfo).ReturnType.IsPointer) return false;
+            if (mb is MethodInfo && (mb as MethodInfo).ReturnType.IsPointer) return true;
 
             if (mb.IsDefined(typeof(BlackListAttribute), false) || mb.IsDefined(typeof(ObsoleteAttribute), false)) return true;
 
@@ -1687,7 +1687,7 @@ namespace XLua
                         il.Emit(OpCodes.Ldc_I4, maxInParamCount + (isStatic ? 0 : 1));
                         il.Emit(OpCodes.Bgt, endOfBlock);
                     }
-                    
+
                     if (!isStatic && !method.IsConstructor)
                     {
                         checkType(il, method.DeclaringType, translator, 1, endOfBlock, false, false);
@@ -1705,7 +1705,7 @@ namespace XLua
                             {
                                 rawParamType = rawParamType.GetElementType();
                             }
-                            checkType(il, rawParamType, translator, argPos++, endOfBlock, 
+                            checkType(il, rawParamType, translator, argPos++, endOfBlock,
                                 hasParams && (j == paramInfos.Length - 1), paramInfo.IsOptional);
                         }
                     }
@@ -1732,7 +1732,7 @@ namespace XLua
                     {
                         argStoreStart = argStore.LocalIndex;
                     }
-                    
+
                 }
                 for (int j = 0; j < paramInfos.Length; j++)
                 {
