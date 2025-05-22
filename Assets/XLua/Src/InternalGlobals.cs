@@ -18,7 +18,9 @@ using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace XLua
 {
@@ -63,6 +65,34 @@ namespace XLua
 #endif
 
         internal static volatile LuaCSFunction LazyReflectionWrap = new LuaCSFunction(Utils.LazyReflectionCall);
+
+        public static bool Gen_Flag { get; } = false;
+        public static Func<int, LuaEnv, DelegateBridgeBase> delegateBridgeMaker;
+
+        static InternalGlobals()
+        {
+            Type InternalGlobalsIniter = null;
+            InternalGlobalsIniter = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                select assembly.GetType($"XLua.{nameof(InternalGlobalsIniter)}")).FirstOrDefault(x => x!=null);
+            if (InternalGlobalsIniter != null)
+            {
+                Gen_Flag = true;
+                Activator.CreateInstance(InternalGlobalsIniter);
+            }
+        }
+
+        public static void InitByGen(
+            Dictionary<Type, IEnumerable<MethodInfo>> _extensionMethodMap, 
+            TryArrayGet _genTryArrayGetPtr,
+            TryArraySet _genTryArraySetPtr,
+            Func<int, LuaEnv, DelegateBridgeBase> _delegateBridgeMaker)
+        {
+            extensionMethodMap = _extensionMethodMap;
+            genTryArrayGetPtr = _genTryArrayGetPtr;
+            genTryArraySetPtr = _genTryArraySetPtr;
+            delegateBridgeMaker = _delegateBridgeMaker;
+        }
+
     }
 
 }
