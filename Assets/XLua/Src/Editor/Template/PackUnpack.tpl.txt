@@ -1,4 +1,4 @@
-#if USE_UNI_LUA
+﻿#if USE_UNI_LUA
 using LuaAPI = UniLua.Lua;
 using RealStatePtr = UniLua.ILuaState;
 using LuaCSFunction = UniLua.CSharpFunctionDelegate;
@@ -15,7 +15,7 @@ require "TemplateCommon"
 
 namespace XLua
 {
-    public static partial class CopyByValue
+    public class CopyByValue_Gen: CopyByValue
     {
         <%ForEachCsList(type_infos, function(type_info)
         local full_type_name = CsFullTypeName(type_info.Type)
