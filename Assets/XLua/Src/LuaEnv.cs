@@ -29,7 +29,7 @@ namespace XLua
 
         internal RealStatePtr rawL;
 
-        internal RealStatePtr L
+        public RealStatePtr L
         {
             get
             {
@@ -43,9 +43,9 @@ namespace XLua
 
         private LuaTable _G;
 
-        internal ObjectTranslator translator;
+        public ObjectTranslator translator { get; private set; }
 
-        internal int errorFuncRef = -1;
+        public int errorFuncRef { get; } = -1;
 
 #if THREAD_SAFE || HOTFIX_ENABLE
         internal /*static*/ object luaLock = new object();

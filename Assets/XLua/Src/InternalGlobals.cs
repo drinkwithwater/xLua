@@ -24,18 +24,18 @@ using UnityEngine;
 
 namespace XLua
 {
-    internal partial class InternalGlobals
+    public class InternalGlobals
     {
 #if !THREAD_SAFE && !HOTFIX_ENABLE
         internal static byte[] strBuff = new byte[256];
 #endif
 
-        internal delegate bool TryArrayGet(Type type, RealStatePtr L, ObjectTranslator translator, object obj, int index);
-        internal delegate bool TryArraySet(Type type, RealStatePtr L, ObjectTranslator translator, object obj, int array_idx, int obj_idx);
+        public delegate bool TryArrayGet(Type type, RealStatePtr L, ObjectTranslator translator, object obj, int index);
+        public delegate bool TryArraySet(Type type, RealStatePtr L, ObjectTranslator translator, object obj, int array_idx, int obj_idx);
         internal static volatile TryArrayGet genTryArrayGetPtr = null;
         internal static volatile TryArraySet genTryArraySetPtr = null;
 
-        internal static volatile ITranslatorPool translatorPool;
+        public static volatile ITranslatorPool translatorPool = null;
 
         internal static volatile int LUA_REGISTRYINDEX = -10000;
 
