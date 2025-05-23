@@ -7,6 +7,7 @@ using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
+/* gen by LuaDelegateWrap.tpl.txt */
 
 using XLua;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace XLua.CSObjectWrap
     {
 		public static void __Register(RealStatePtr L)
         {
-            ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            ObjectGenTranslator translator = ObjectGenTranslatorPool.Instance.Find(L);
 		    Utils.BeginObjectRegister(typeof(<%=CsFullTypeName(type)%>), L, translator, 0, 0, 0, 0);
 			Utils.EndObjectRegister(typeof(<%=CsFullTypeName(type)%>), L, translator, null, null, null, null, null);
 			
@@ -44,7 +45,7 @@ namespace XLua.CSObjectWrap
 		[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int __CallMeta(RealStatePtr L)
         {
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectGenTranslator translator = ObjectGenTranslatorPool.Instance.Find(L);
 			try {
 				if(LuaAPI.lua_gettop(L) == <%=in_num+1%> && <%=GetCheckStatement(type, 1)%><%
 					ForEachCsList(parameters, function(parameter) 
@@ -100,7 +101,7 @@ namespace XLua.CSObjectWrap
 		[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int __AddMeta(RealStatePtr L)
 		{
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectGenTranslator translator = ObjectGenTranslatorPool.Instance.Find(L);
 			try {
 				<%=GetCasterStatement(type, 1, "leftside", true)%>;
 				<%=GetCasterStatement(type, 2, "rightside", true)%>;
@@ -114,7 +115,7 @@ namespace XLua.CSObjectWrap
 		[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int __SubMeta(RealStatePtr L)
 		{
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectGenTranslator translator = ObjectGenTranslatorPool.Instance.Find(L);
 			try {
 				<%=GetCasterStatement(type, 1, "leftside", true)%>;
 				<%=GetCasterStatement(type, 2, "rightside", true)%>;

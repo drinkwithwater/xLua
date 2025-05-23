@@ -7,6 +7,7 @@ using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
+/* gen by LuaEnumWrapGCM.tpl.txt */
 
 using XLua;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ local enum_or_op = debug.getmetatable(CS.System.Reflection.BindingFlags.Public).
 
 namespace XLua
 {
-	public partial class ObjectTranslator
+	public partial class ObjectGenTranslator
     {
     <%ForEachCsList(types, function(type)
 	local fields = type2fields and type2fields[type] or type:GetFields(enum_or_op(CS.System.Reflection.BindingFlags.Public, CS.System.Reflection.BindingFlags.Static))

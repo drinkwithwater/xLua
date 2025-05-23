@@ -7,6 +7,7 @@ using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
+/* gen by LuaWrapPusher.tpl.txt */
 
 using System;
 <%
@@ -15,35 +16,25 @@ require "TemplateCommon"
 
 namespace XLua
 {
-    public partial class ObjectTranslator
+    public partial class ObjectGenTranslator: ObjectTranslator
     {
-        <%if purevaluetypes.Count > 0 then
-        local init_class_name = "IniterAdder" .. CSVariableName(purevaluetypes[0].Type)
-        %>
-        class <%=init_class_name%>
+	    public ObjectGenTranslator(LuaEnv luaenv, RealStatePtr L) : base(luaenv, L)
+	    {
+	    }
+	    
+        public static void Initer(LuaEnv luaenv, ObjectTranslator primaryTranslator)
         {
-            static <%=init_class_name%>()
-            {
-                LuaEnv.AddIniter(Init);
-            }
-			
-			static void Init(LuaEnv luaenv, ObjectTranslator translator)
-			{
-			<%ForEachCsList(purevaluetypes, function(type_info)
-            if not type_info.Type.IsValueType then return end
-            local full_type_name = CsFullTypeName(type_info.Type)%>
-				translator.RegisterPushAndGetAndUpdate<<%=full_type_name%>>(translator.Push<%=CSVariableName(type_info.Type)%>, translator.Get, translator.Update<%=CSVariableName(type_info.Type)%>);<%
-			end)%>
-			<%ForEachCsList(tableoptimzetypes, function(type_info)
-            local full_type_name = CsFullTypeName(type_info.Type)%>
-				translator.RegisterCaster<<%=full_type_name%>>(translator.Get);<%
-			end)%>
-			}
+            var translator = primaryTranslator as ObjectGenTranslator;
+        <%ForEachCsList(purevaluetypes, function(type_info)
+        if not type_info.Type.IsValueType then return end
+        local full_type_name = CsFullTypeName(type_info.Type)%>
+            translator.RegisterPushAndGetAndUpdate<<%=full_type_name%>>(translator.Push<%=CSVariableName(type_info.Type)%>, translator.Get, translator.Update<%=CSVariableName(type_info.Type)%>);<%
+        end)%>
+        <%ForEachCsList(tableoptimzetypes, function(type_info)
+        local full_type_name = CsFullTypeName(type_info.Type)%>
+            translator.RegisterCaster<<%=full_type_name%>>(translator.Get);<%
+        end)%>
         }
-        
-        static <%=init_class_name%> s_<%=init_class_name%>_dumb_obj = new <%=init_class_name%>();
-        static <%=init_class_name%> <%=init_class_name%>_dumb_obj {get{return s_<%=init_class_name%>_dumb_obj;}}
-        <%end%>
         
         <%ForEachCsList(purevaluetypes, function(type_info)
         local type_id_var_name = CSVariableName(type_info.Type) .. '_TypeID'
@@ -76,7 +67,7 @@ namespace XLua
 			end
 			if type_info.Flag == CS.XLua.OptimizeFlag.PackAsTable then
 			%>
-			<%if PushObjectNeedTranslator(type_info) then %>    ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);<%end%>
+			<%if PushObjectNeedTranslator(type_info) then %>    ObjectGenTranslator translator = ObjectGenTranslatorPool.Instance.Find(L);<%end%>
 			LuaAPI.xlua_pushcstable(L, <%=type_info.FieldInfos.Count%>, <%=type_id_var_name%>);
 			<%ForEachCsList(type_info.FieldInfos, function(fieldInfo)%>
 			LuaAPI.xlua_pushasciistring(L, "<%=fieldInfo.Name%>");
@@ -196,8 +187,9 @@ namespace XLua
 	
 	public class StaticLuaCallbacks_Array
     {
-	    internal static bool __tryArrayGet(Type type, RealStatePtr L, ObjectTranslator translator, object obj, int index)
+	    internal static bool __tryArrayGet(Type type, RealStatePtr L, ObjectTranslator primaryTranslator, object obj, int index)
 		{
+            var translator = primaryTranslator as ObjectGenTranslator;
 		<%ForEachCsList(purevaluetypes, function(type_info, idx)
 		if not type_info.Type.IsValueType then return end
 		local full_type_name = CsFullTypeName(type_info.Type)
@@ -212,8 +204,9 @@ namespace XLua
             return false;
 		}
 		
-		internal static bool __tryArraySet(Type type, RealStatePtr L, ObjectTranslator translator, object obj, int array_idx, int obj_idx)
+		internal static bool __tryArraySet(Type type, RealStatePtr L, ObjectTranslator primaryTranslator, object obj, int array_idx, int obj_idx)
 		{
+            var translator = primaryTranslator as ObjectGenTranslator;
 		<%
 		local is_first = true
 		ForEachCsList(purevaluetypes, tableoptimzetypes, function(type_info)
@@ -228,6 +221,41 @@ namespace XLua
 		    is_first = false
 		end)%>
             return false;
+		}
+	}
+	
+}
+
+namespace XLua
+{
+	public class ObjectGenTranslatorPool: TranslatorPool<ObjectGenTranslator>
+	{
+        public static ObjectGenTranslatorPool Instance = new ObjectGenTranslatorPool();
+
+#if UNITY_EDITOR || XLUA_GENERAL
+        public static ObjectTranslator FindTranslator(RealStatePtr L)
+        {
+            return InternalGlobals.translatorPool.PrimaryFind(L);
+        }
+#endif
+	}
+	
+	public class InternalGlobalsGen
+    {
+	    static InternalGlobalsGen()
+		{
+		    var extensionMethodMap = MakeExtensionMethodMap.build();
+			
+			InternalGlobals.InitByGen(
+				extensionMethodMap, 
+				StaticLuaCallbacks_Array.__tryArrayGet, 
+				StaticLuaCallbacks_Array.__tryArraySet, 
+				(reference, env)=>new DelegatesGensBridge(reference, env),
+				(env, l)=>new ObjectGenTranslator(env, l),
+				()=>ObjectGenTranslatorPool.Instance
+			);
+		    XLua.LuaEnv.AddIniter(XLua.CSObjectWrap.XLua_Gen_Initer_Register__.Initer);
+		    XLua.LuaEnv.AddIniter(XLua.ObjectGenTranslator.Initer);
 		}
 	}
 }

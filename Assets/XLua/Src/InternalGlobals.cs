@@ -35,7 +35,7 @@ namespace XLua
         internal static volatile TryArrayGet genTryArrayGetPtr = null;
         internal static volatile TryArraySet genTryArraySetPtr = null;
 
-        internal static volatile ObjectTranslatorPool objectTranslatorPool = new ObjectTranslatorPool();
+        internal static volatile ITranslatorPool translatorPool;
 
         internal static volatile int LUA_REGISTRYINDEX = -10000;
 
@@ -66,19 +66,26 @@ namespace XLua
 
         internal static volatile LuaCSFunction LazyReflectionWrap = new LuaCSFunction(Utils.LazyReflectionCall);
 
-        public static bool ifgen { get; } = false;
-        public static Func<int, LuaEnv, DelegateBridgeBase> ifgen_delegateBridgeMaker;
-        public static Func<LuaEnv, RealStatePtr, ObjectTranslator> ifgen_objectTranslatorMaker;
+        public static bool ifgen { get; }
+        public static Func<int, LuaEnv, DelegateBridgeBase> ifgen_delegateBridgeMaker { get; private set; }
+        public static Func<LuaEnv, RealStatePtr, ObjectTranslator> ifgen_objectTranslatorMaker { get; private set; }
+        private static Func<ITranslatorPool> ifgen_translatorPoolGetter;
 
         static InternalGlobals()
         {
-            Type InternalGlobalsIniter = null;
-            InternalGlobalsIniter = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                select assembly.GetType($"XLua.{nameof(InternalGlobalsIniter)}")).FirstOrDefault(x => x!=null);
-            if (InternalGlobalsIniter != null)
+            Type InternalGlobalsGen = null;
+            InternalGlobalsGen = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                select assembly.GetType($"XLua.{nameof(InternalGlobalsGen)}")).FirstOrDefault(x => x!=null);
+            if (InternalGlobalsGen != null)
             {
                 ifgen = true;
-                Activator.CreateInstance(InternalGlobalsIniter);
+                Activator.CreateInstance(InternalGlobalsGen);
+                translatorPool = ifgen_translatorPoolGetter();
+            }
+            else
+            {
+                ifgen = false;
+                translatorPool = new ObjectTranslatorPool();
             }
         }
 
@@ -87,7 +94,8 @@ namespace XLua
             TryArrayGet _genTryArrayGetPtr,
             TryArraySet _genTryArraySetPtr,
             Func<int, LuaEnv, DelegateBridgeBase> _delegateBridgeMaker,
-            Func<LuaEnv, RealStatePtr, ObjectTranslator> _objectTranslatorMaker
+            Func<LuaEnv, RealStatePtr, ObjectTranslator> _objectTranslatorMaker,
+            Func<ITranslatorPool> _translatorPoolGetter
             )
         {
             extensionMethodMap = _extensionMethodMap;
@@ -95,6 +103,7 @@ namespace XLua
             genTryArraySetPtr = _genTryArraySetPtr;
             ifgen_delegateBridgeMaker = _delegateBridgeMaker;
             ifgen_objectTranslatorMaker = _objectTranslatorMaker;
+            ifgen_translatorPoolGetter = _translatorPoolGetter;
         }
 
     }

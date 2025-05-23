@@ -103,7 +103,7 @@ namespace XLua
 #endif
 
 
-    public partial class ObjectTranslator
+    public class ObjectTranslator
     {
         internal MethodWrapsCache methodWrapsCache;
         internal ObjectCheckers objectCheckers;

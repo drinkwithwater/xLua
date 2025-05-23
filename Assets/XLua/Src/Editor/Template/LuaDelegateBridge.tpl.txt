@@ -7,6 +7,7 @@ using LuaAPI = XLua.LuaDLL.Lua;
 using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
+/* gen by LuaDelegateBridge.tpl.txt */
 
 using System;
 <%
@@ -51,7 +52,7 @@ namespace XLua
 #endif
                 RealStatePtr L = luaEnv.rawL;
                 int errFunc = LuaAPI.pcall_prepare(L, errorFuncRef, luaReference);
-                <%if CallNeedTranslator(delegate, "") then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+                <%if CallNeedTranslator(delegate, "") then %>ObjectGenTranslator translator = luaEnv.translator as ObjectGenTranslator;<%end%>
                 <%
                 local param_count = parameters.Length
                 local has_v_params = param_count > 0 and parameters[param_count - 1].IsParamArray

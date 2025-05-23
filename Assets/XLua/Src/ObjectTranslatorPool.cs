@@ -18,35 +18,36 @@ using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 
 using System.Collections.Generic;
 using System;
+using System.IO.Enumeration;
 
 namespace XLua
 {
-	public class ObjectTranslatorPool
+	public class ObjectTranslatorPool: TranslatorPool<ObjectTranslator>
 	{
-#if !SINGLE_ENV
-        private Dictionary<RealStatePtr, WeakReference> translators = new Dictionary<RealStatePtr, WeakReference>();
-        RealStatePtr lastPtr = default(RealStatePtr);
-#endif
-        ObjectTranslator lastTranslator = default(ObjectTranslator);
-
-        public static ObjectTranslatorPool Instance
+        public static ITranslatorPool Instance
 		{
 			get
 			{
-				return InternalGlobals.objectTranslatorPool;
+				return InternalGlobals.translatorPool;
 			}
 		}
 
 #if UNITY_EDITOR || XLUA_GENERAL
         public static ObjectTranslator FindTranslator(RealStatePtr L)
         {
-            return InternalGlobals.objectTranslatorPool.Find(L);
+            return InternalGlobals.translatorPool.PrimaryFind(L);
         }
 #endif
+	}
 
-        public ObjectTranslatorPool ()
-		{
-		}
+	public class TranslatorPool<T>: ITranslatorPool where T: ObjectTranslator
+	{
+#if !SINGLE_ENV
+        private Dictionary<RealStatePtr, WeakReference> translators = new Dictionary<RealStatePtr, WeakReference>();
+        RealStatePtr lastPtr = default(RealStatePtr);
+#endif
+        T lastTranslator = default(T);
+
 		
 		public void Add (RealStatePtr L, ObjectTranslator translator)
 		{
@@ -54,7 +55,7 @@ namespace XLua
             lock (this)
 #endif
             {
-                lastTranslator = translator;
+                lastTranslator = translator as T;
 #if !SINGLE_ENV
                 var ptr = LuaAPI.xlua_gl(L);
                 lastPtr = ptr;
@@ -63,7 +64,7 @@ namespace XLua
             }
         }
 
-		public ObjectTranslator Find (RealStatePtr L)
+		public T Find (RealStatePtr L)
 		{
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (this)
@@ -77,7 +78,7 @@ namespace XLua
                 if (translators.ContainsKey(ptr))
                 {
                     lastPtr = ptr;
-                    lastTranslator = translators[ptr].Target as ObjectTranslator;
+                    lastTranslator = translators[ptr].Target as T;
                     return lastTranslator;
                 }
                 
@@ -102,13 +103,25 @@ namespace XLua
                 if (lastPtr == ptr)
                 {
                     lastPtr = default(RealStatePtr);
-                    lastTranslator = default(ObjectTranslator);
+                    lastTranslator = default(T);
                 }
 
                 translators.Remove(ptr);
 #endif
             }
         }
-    }
+
+		ObjectTranslator ITranslatorPool.PrimaryFind(RealStatePtr L)
+		{
+			return Find(L);
+		}
+	}
+
+	public interface ITranslatorPool
+	{
+		public void Add(RealStatePtr L, ObjectTranslator translator);
+		public ObjectTranslator PrimaryFind(RealStatePtr L);
+		public void Remove(RealStatePtr L);
+	}
 }
 
