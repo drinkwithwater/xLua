@@ -253,7 +253,7 @@ namespace CSObjectWrapEditor
             return DoNotGen.ContainsKey(type) && DoNotGen[type].Contains(name);
         }
 
-        static void getClassInfo(Type type, LuaTable parameters)
+        public static void getClassInfo(Type type, LuaTable parameters)
         {
             parameters.Set("type", type);
 
@@ -500,7 +500,7 @@ namespace CSObjectWrapEditor
                     .ToList());
         }
 
-        static bool isObsolete(MemberInfo mb)
+        public static bool isObsolete(MemberInfo mb)
         {
             if (mb == null) return false;
             ObsoleteAttribute oa = GetCustomAttribute(mb, typeof(ObsoleteAttribute)) as ObsoleteAttribute;
@@ -521,7 +521,7 @@ namespace CSObjectWrapEditor
             return (type.DeclaringType != null) ? isObsolete(type.DeclaringType) : false;
         }
 
-        static bool isMemberInBlackList(MemberInfo mb)
+        public static bool isMemberInBlackList(MemberInfo mb)
         {
             if (isDefined(mb, typeof(BlackListAttribute))) return true;
             if (mb is FieldInfo && (mb as FieldInfo).FieldType.IsPointer) return true;
