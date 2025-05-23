@@ -58,7 +58,7 @@ namespace XLua.CSObjectWrap
 #endif
 				RealStatePtr L = luaEnv.L;
 				int err_func = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-				<%if CallNeedTranslator(method, "") then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+				<%if CallNeedTranslator(method, "") then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 				
 				LuaAPI.lua_getref(L, luaReference);
 				LuaAPI.xlua_pushasciistring(L, "<%=method.Name%>");
@@ -117,7 +117,7 @@ namespace XLua.CSObjectWrap
 #endif
 					RealStatePtr L = luaEnv.L;
 					int oldTop = LuaAPI.lua_gettop(L);
-					<%if not JustLuaType(property.PropertyType) then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+					<%if not JustLuaType(property.PropertyType) then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 					LuaAPI.lua_getref(L, luaReference);
 					LuaAPI.xlua_pushasciistring(L, "<%=property.Name%>");
 					if (0 != LuaAPI.xlua_pgettable(L, -2))
@@ -141,7 +141,7 @@ namespace XLua.CSObjectWrap
 #endif
 					RealStatePtr L = luaEnv.L;
 					int oldTop = LuaAPI.lua_gettop(L);
-					<%if not JustLuaType(property.PropertyType) then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+					<%if not JustLuaType(property.PropertyType) then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 					LuaAPI.lua_getref(L, luaReference);
 					LuaAPI.xlua_pushasciistring(L, "<%=property.Name%>");
 					<%=GetPushStatement(property.PropertyType, "value")%>;
@@ -169,7 +169,7 @@ namespace XLua.CSObjectWrap
 #endif
 					RealStatePtr L = luaEnv.L;
 					int err_func = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-					<%if CallNeedTranslator(event:GetAddMethod(), "") then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+					<%if CallNeedTranslator(event:GetAddMethod(), "") then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 				
 					LuaAPI.lua_getref(L, luaReference);
 					LuaAPI.xlua_pushasciistring(L, "add_<%=event.Name%>");
@@ -212,7 +212,7 @@ namespace XLua.CSObjectWrap
 #endif
 					RealStatePtr L = luaEnv.L;
 					int err_func = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-					<%if CallNeedTranslator(event:GetRemoveMethod(), "") then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+					<%if CallNeedTranslator(event:GetRemoveMethod(), "") then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 				
 					LuaAPI.lua_getref(L, luaReference);
 					LuaAPI.xlua_pushasciistring(L, "remove_<%=event.Name%>");
@@ -273,7 +273,7 @@ namespace XLua.CSObjectWrap
 #endif
 					RealStatePtr L = luaEnv.L;
 					int err_func = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-					<%if CallNeedTranslator(method, "") then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+					<%if CallNeedTranslator(method, "") then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 				
 					LuaAPI.lua_getref(L, luaReference);
 					LuaAPI.xlua_pushasciistring(L, "<%=method.Name%>");
@@ -336,7 +336,7 @@ namespace XLua.CSObjectWrap
 #endif
 					RealStatePtr L = luaEnv.L;
 					int err_func = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-					<%if CallNeedTranslator(method, "") then %>ObjectTranslator translator = luaEnv.translator;<%end%>
+					<%if CallNeedTranslator(method, "") then %>var translator = luaEnv.translator as ObjectGenTranslator;<%end%>
 				
 					LuaAPI.lua_getref(L, luaReference);
 					LuaAPI.xlua_pushasciistring(L, "<%=method.Name%>");
